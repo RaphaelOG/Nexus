@@ -3,8 +3,20 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const server = app.listen(process.env.PORT || 5000, () => {
-  console.log(`Server running on port ${server.address().port}`);
+
+const PORT = process.env.PORT || 5500;
+
+const server = app.listen(PORT, () => {
+  const addr = server.address();
+  if (addr && addr.port) {
+    console.log(`Server running on port ${addr.port}`);
+  } else {
+    console.error('Server started but no address info is available.');
+  }
+});
+
+server.on('error', (err) => {
+  console.error('Server failed to start:', err.message);
 });
 
 const io = require('socket.io')(server);
