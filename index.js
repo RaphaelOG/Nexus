@@ -19,7 +19,13 @@ server.on('error', (err) => {
   console.error('Server failed to start:', err.message);
 });
 
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
 const { SessionsClient } = require('@google-cloud/dialogflow');
 
 // Configuration
@@ -36,11 +42,12 @@ try {
   console.log('Dialogflow client initialized successfully');
 } catch (error) {
   console.error('Failed to initialize Dialogflow client:', error.message);
+  console.log('Will use fallback responses instead');
 }
 
 // Middleware
-app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/public'));
+app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
@@ -53,10 +60,12 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', async (text) => {
     try {
-      console.log(`User message: ${text}`);
+      console.log(`User message received: "${text}"`);
       
       if (!text || text.trim() === '') {
-        throw new Error('Empty message received');
+        console.log('Empty message received');
+        socket.emit('bot reply', 'I didn\'t hear anything. Could you please try again?');
+        return;
       }
 
       let aiText;
@@ -64,22 +73,27 @@ io.on('connection', (socket) => {
       // Try Dialogflow first, fallback to built-in responses
       if (dialogflowClient) {
         try {
+          console.log('Attempting Dialogflow response...');
           const response = await getDialogflowResponse(text);
           aiText = processDialogflowResponse(response);
+          console.log('Dialogflow response successful');
         } catch (dialogflowError) {
           console.warn('Dialogflow failed, using fallback:', dialogflowError.message);
           aiText = getFallbackResponse(text);
         }
       } else {
+        console.log('Using fallback response (no Dialogflow client)');
         aiText = getFallbackResponse(text);
       }
       
-      console.log(`Bot response: ${aiText}`);
+      console.log(`Bot response: "${aiText}"`);
       socket.emit('bot reply', aiText);
       
     } catch (error) {
       console.error('Processing error:', error);
-      socket.emit('bot reply', getErrorMessage(error));
+      const errorResponse = getErrorMessage(error);
+      console.log(`Error response: "${errorResponse}"`);
+      socket.emit('bot reply', errorResponse);
     }
   });
 
@@ -115,7 +129,9 @@ async function getDialogflowResponse(text) {
   };
 
   try {
+    console.log('Sending request to Dialogflow...');
     const responses = await dialogflowClient.detectIntent(request);
+    console.log('Dialogflow response received');
     return responses[0];
   } catch (error) {
     console.error('Dialogflow API Error Details:', {
@@ -152,10 +168,12 @@ function processDialogflowResponse(response) {
 }
 
 function getFallbackResponse(text) {
-  const lowerText = text.toLowerCase();
+  const lowerText = text.toLowerCase().trim();
+  
+  console.log(`Generating fallback response for: "${lowerText}"`);
   
   // Greeting responses
-  if (lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('hey')) {
+  if (lowerText.includes('hello') || lowerText.includes('hi') || lowerText.includes('hey') || lowerText === 'hi there') {
     return "Hello! I'm Nexus AI, your advanced voice assistant. How can I help you today?";
   }
   
@@ -165,18 +183,18 @@ function getFallbackResponse(text) {
   }
   
   // Name responses
-  if (lowerText.includes('what is your name') || lowerText.includes('who are you')) {
+  if (lowerText.includes('what is your name') || lowerText.includes('who are you') || lowerText.includes('your name')) {
     return "I am Nexus AI, an advanced artificial intelligence assistant designed to help you with various tasks and answer your questions.";
   }
   
   // Time responses
-  if (lowerText.includes('what time') || lowerText.includes('current time')) {
+  if (lowerText.includes('what time') || lowerText.includes('current time') || lowerText.includes('time is it')) {
     const now = new Date();
     return `The current time is ${now.toLocaleTimeString()}. Is there anything else I can help you with?`;
   }
   
   // Date responses
-  if (lowerText.includes('what date') || lowerText.includes('today') || lowerText.includes('current date')) {
+  if (lowerText.includes('what date') || lowerText.includes('today') || lowerText.includes('current date') || lowerText.includes('what day')) {
     const now = new Date();
     return `Today is ${now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}. How can I assist you further?`;
   }
@@ -204,15 +222,31 @@ function getFallbackResponse(text) {
   // Math operations
   if (lowerText.includes('calculate') || lowerText.includes('math') || /\d+\s*[\+\-\*\/]\s*\d+/.test(lowerText)) {
     try {
-      const mathExpression = lowerText.match(/\d+\s*[\+\-\*\/]\s*\d+/);
+      const mathExpression = lowerText.match(/(\d+)\s*([\+\-\*\/])\s*(\d+)/);
       if (mathExpression) {
-        // Simple math evaluation (be careful with eval in production)
-        const result = Function('"use strict"; return (' + mathExpression[0].replace(/[^0-9+\-*/().]/g, '') + ')')();
+        const num1 = parseFloat(mathExpression[1]);
+        const operator = mathExpression[2];
+        const num2 = parseFloat(mathExpression[3]);
+        let result;
+        
+        switch(operator) {
+          case '+': result = num1 + num2; break;
+          case '-': result = num1 - num2; break;
+          case '*': result = num1 * num2; break;
+          case '/': result = num2 !== 0 ? num1 / num2 : 'undefined (division by zero)'; break;
+          default: result = 'invalid operation';
+        }
+        
         return `The result is ${result}. Is there anything else you'd like me to calculate?`;
       }
     } catch (error) {
       return "I can help with basic math operations. Try asking me something like 'calculate 5 plus 3' or '10 times 2'.";
     }
+  }
+  
+  // Test responses
+  if (lowerText.includes('test') || lowerText === 'testing') {
+    return "Test successful! I'm receiving your message and responding correctly. The system is working as expected.";
   }
   
   // Default intelligent response
@@ -221,10 +255,13 @@ function getFallbackResponse(text) {
     "I understand you're asking about that topic. Can you be more specific about what you'd like to know?",
     "I'm processing your request. Could you rephrase that or provide more context?",
     "I want to give you the most helpful response possible. Can you elaborate on what you're looking for?",
-    "That's a great question! Let me think about that. Could you provide a bit more information?"
+    "That's a great question! Let me think about that. Could you provide a bit more information?",
+    `I heard you say "${text}". I'm here to help - could you tell me more about what you need?`
   ];
   
-  return responses[Math.floor(Math.random() * responses.length)];
+  const selectedResponse = responses[Math.floor(Math.random() * responses.length)];
+  console.log(`Selected fallback response: "${selectedResponse}"`);
+  return selectedResponse;
 }
 
 function getErrorMessage(error) {
