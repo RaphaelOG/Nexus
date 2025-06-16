@@ -3,13 +3,22 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+const OpenAI = require('openai');
 
-const PORT = process.env.PORT || 5500;
+const PORT = process.env.PORT || 5000;
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 const server = app.listen(PORT, () => {
   const addr = server.address();
   if (addr && addr.port) {
-    console.log(`Server running on port ${addr.port}`);
+    const localhostUrl = `http://localhost:${addr.port}`;
+    console.log('\nServer is running! You can access it at:');
+    console.log(`🌐 Local: ${localhostUrl}`);
+    console.log('\n');
   } else {
     console.error('Server started but no address info is available.');
   }
@@ -20,17 +29,6 @@ server.on('error', (err) => {
 });
 
 const io = require('socket.io')(server);
-const { SessionsClient } = require('@google-cloud/dialogflow');
-
-// Configuration
-const DIALOGFLOW_PROJECT_ID = process.env.DIALOGFLOW_PROJECT_ID || "jarvis-bvff";
-const DIALOGFLOW_SESSION_ID = process.env.DIALOGFLOW_SESSION_ID || generateSessionId();
-
-// Initialize Dialogflow client with explicit credentials
-const dialogflowClient = new SessionsClient({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  projectId: DIALOGFLOW_PROJECT_ID
-});
 
 // Middleware
 app.use(express.static(__dirname + '/views'));
@@ -53,11 +51,9 @@ io.on('connection', (socket) => {
         throw new Error('Empty message received');
       }
 
-      const response = await getDialogflowResponse(text);
-      const aiText = processDialogflowResponse(response);
-      
-      console.log(`Bot response: ${aiText}`);
-      socket.emit('bot reply', aiText);
+      const response = await getAIResponse(text);
+      console.log(`Bot response: ${response}`);
+      socket.emit('bot reply', response);
       
     } catch (error) {
       console.error('Processing error:', error);
@@ -70,72 +66,42 @@ io.on('connection', (socket) => {
   });
 });
 
-// Helper Functions
-function generateSessionId() {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
-}
-
-async function getDialogflowResponse(text) {
-  const sessionPath = dialogflowClient.projectAgentSessionPath(
-    DIALOGFLOW_PROJECT_ID,
-    DIALOGFLOW_SESSION_ID
-  );
-
-  const request = {
-    session: sessionPath,
-    queryInput: {
-      text: {
-        text: text,
-        languageCode: 'en-US',
-      },
-    },
-  };
-
+async function getAIResponse(text) {
   try {
-    const responses = await dialogflowClient.detectIntent(request);
-    return responses[0];
-  } catch (error) {
-    console.error('Dialogflow API Error Details:', {
-      code: error.code,
-      details: error.details,
-      metadata: error.metadata
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini-2024-07-18",
+      messages: [
+        {
+          role: "system",
+          content: `You are a friendly and engaging AI assistant. Your responses should be:
+- Conversational and natural, like a real person
+- Use casual language and occasional contractions (I'm, you're, etc.)
+- Show personality and warmth
+- Keep responses concise but engaging
+- Use natural speech patterns and occasional filler words when appropriate
+- Be helpful while maintaining a friendly tone`
+        },
+        {
+          role: "user",
+          content: text
+        }
+      ],
+      temperature: 0.85, // Increased for more natural variation
+      max_tokens: 150,
+      presence_penalty: 0.6, // Encourages more diverse and natural responses
+      frequency_penalty: 0.3 // Reduces repetition
     });
+
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.error('OpenAI API Error:', error);
     throw error;
   }
 }
 
-function processDialogflowResponse(response) {
-  if (!response || !response.queryResult) {
-    throw new Error('Invalid Dialogflow response structure');
-  }
-
-  const result = response.queryResult;
-  
-  if (result.fulfillmentText) {
-    return result.fulfillmentText;
-  }
-  
-  if (result.fulfillmentMessages?.length > 0) {
-    for (const message of result.fulfillmentMessages) {
-      if (message.text?.text?.length > 0) {
-        return message.text.text[0];
-      }
-    }
-  }
-  
-  return result.intent?.displayName 
-    ? `I understood you wanted to talk about ${result.intent.displayName}`
-    : "I'm not sure how to respond to that. Could you rephrase?";
-}
-
 function getErrorMessage(error) {
-  if (error.code === 7 || error.message.includes('PERMISSION_DENIED')) {
-    console.error('PERMISSION ERROR: Please verify:');
-    console.error('1. Service account has "Dialogflow API Admin" role');
-    console.error('2. Correct project ID is being used');
-    console.error('3. Dialogflow API is enabled');
-    return "I'm having authentication issues. Please check my permissions.";
+  if (error.response?.status === 401) {
+    return "I'm having authentication issues. Please check the API key.";
   }
   return "Sorry, I encountered an error. Please try again.";
 }

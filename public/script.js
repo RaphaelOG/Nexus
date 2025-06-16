@@ -5,8 +5,18 @@ const CONFIG = {
   MIN_CONFIDENCE: 0.4, // Minimum confidence level to accept speech
   RETRY_DELAY: 2000, // Delay before retrying after errors (ms)
   MAX_RETRIES: 3, // Maximum number of retry attempts
-  SPEECH_RATE: 0.95, // Slightly slower than normal speech
-  SPEECH_PITCH: 1.1 // Slightly higher pitch for better clarity
+  SPEECH_RATE: 0.9, // Slightly slower for more natural pacing
+  SPEECH_PITCH: 1.0, // Natural pitch
+  SPEECH_VOLUME: 1.0, // Full volume
+  PREFERRED_VOICES: [
+    'Google UK English Male',
+    'Microsoft David - English (United States)',
+    'Microsoft Mark - English (United States)',
+    'Microsoft Zira - English (United States)',
+    'Alex', // Safari
+    'Daniel', // Safari
+    'Samantha' // macOS
+  ]
 };
 
 // State management
@@ -66,22 +76,29 @@ function initializeSpeechSynthesis() {
   
   function loadVoices() {
     const voices = synth.getVoices();
-    const preferredVoices = [
-      'Google UK English Male',
-      'Microsoft David - English (United States)',
-      'Alex' // Safari
-    ];
     
-    for (const voiceName of preferredVoices) {
+    // Try to find the best available voice
+    for (const voiceName of CONFIG.PREFERRED_VOICES) {
       const voice = voices.find(v => v.name.includes(voiceName));
       if (voice) {
         utterance.voice = voice;
+        console.log('Selected voice:', voice.name);
         break;
       }
     }
     
+    // Apply natural speech settings
     utterance.rate = CONFIG.SPEECH_RATE;
     utterance.pitch = CONFIG.SPEECH_PITCH;
+    utterance.volume = CONFIG.SPEECH_VOLUME;
+    
+    // Add slight pauses for more natural speech
+    utterance.onboundary = (event) => {
+      if (event.name === 'sentence') {
+        synth.pause();
+        setTimeout(() => synth.resume(), 150); // Add a small pause between sentences
+      }
+    };
   }
 
   if (synth.onvoiceschanged !== undefined) {
