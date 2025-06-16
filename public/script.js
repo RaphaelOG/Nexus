@@ -5,17 +5,17 @@ const CONFIG = {
   MIN_CONFIDENCE: 0.4, // Minimum confidence level to accept speech
   RETRY_DELAY: 2000, // Delay before retrying after errors (ms)
   MAX_RETRIES: 3, // Maximum number of retry attempts
-  SPEECH_RATE: 0.9, // Slightly slower for more natural pacing
+  SPEECH_RATE: 0.95, // Slightly slower for more natural pacing
   SPEECH_PITCH: 1.0, // Natural pitch
   SPEECH_VOLUME: 1.0, // Full volume
   PREFERRED_VOICES: [
-    'Google UK English Male',
     'Microsoft David - English (United States)',
     'Microsoft Mark - English (United States)',
     'Microsoft Zira - English (United States)',
-    'Alex', // Safari
-    'Daniel', // Safari
-    'Samantha' // macOS
+    'Google UK English Male',
+    'Google UK English Female',
+    'Samantha', // macOS
+   
   ]
 };
 
@@ -143,11 +143,16 @@ function initializeSpeechSynthesis() {
     utterance.pitch = CONFIG.SPEECH_PITCH;
     utterance.volume = CONFIG.SPEECH_VOLUME;
     
-    // Add slight pauses for more natural speech
+    // Add natural pauses and emphasis
     utterance.onboundary = (event) => {
       if (event.name === 'sentence') {
         synth.pause();
-        setTimeout(() => synth.resume(), 150); // Add a small pause between sentences
+        setTimeout(() => synth.resume(), 200); // Longer pause between sentences
+      } else if (event.name === 'word') {
+        // Add slight variation to word timing
+        const randomDelay = Math.random() * 50;
+        synth.pause();
+        setTimeout(() => synth.resume(), randomDelay);
       }
     };
   }
@@ -309,8 +314,24 @@ function handleBotReply(replyText) {
   
   if (speechSynthesis) {
     try {
-      speechSynthesis.utterance.text = replyText;
-      speechSynthesis.synth.speak(speechSynthesis.utterance);
+      // Add natural pauses at punctuation
+      const processedText = replyText
+        .replace(/\./g, '. ')
+        .replace(/!/g, '! ')
+        .replace(/\?/g, '? ')
+        .replace(/,/g, ', ')
+        .replace(/;/g, '; ')
+        .trim();
+
+      speechSynthesis.utterance.text = processedText;
+      
+      // Cancel any ongoing speech
+      speechSynthesis.synth.cancel();
+      
+      // Add a small delay before speaking
+      setTimeout(() => {
+        speechSynthesis.synth.speak(speechSynthesis.utterance);
+      }, 100);
     } catch (error) {
       console.error('Speech synthesis failed:', error);
     }

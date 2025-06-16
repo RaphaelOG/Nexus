@@ -23,18 +23,18 @@
 
 /* Light theme variables */
 :root.light-theme {
-  --primary: #0066cc;
-  --primary-dark: #004499;
-  --secondary: #6b46c1;
-  --bg-dark: #f8fafc;
-  --bg-darker: #ffffff;
-  --text-light: #374151;
-  --text-lighter: #111827;
-  --text-dark: #6b7280;
-  --accent: #dc2626;
-  --success: #059669;
-  --warning: #d97706;
-  --error: #dc2626;
+  --primary: #2563eb; /* Modern blue */
+  --primary-dark: #1d4ed8; /* Darker blue */
+  --secondary: #7c3aed; /* Modern purple */
+  --bg-dark: #f1f5f9; /* Light gray background */
+  --bg-darker: #ffffff; /* White */
+  --text-light: #334155; /* Slate gray for main text */
+  --text-lighter: #0f172a; /* Dark slate for headings */
+  --text-dark: #64748b; /* Medium slate for secondary text */
+  --accent: #ef4444; /* Modern red */
+  --success: #10b981; /* Modern green */
+  --warning: #f59e0b; /* Modern amber */
+  --error: #ef4444; /* Modern red */
 }
 
 html {
@@ -164,9 +164,9 @@ body {
 }
 
 :root.light-theme .voice-interface {
-  background: rgba(248, 250, 252, 0.9);
-  border: 1px solid rgba(0, 102, 204, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .voice-visualizer {
@@ -180,8 +180,8 @@ body {
 }
 
 :root.light-theme .voice-visualizer {
-  background: linear-gradient(180deg, rgba(0, 102, 204, 0.05) 0%, transparent 100%);
-  border-bottom: 1px solid rgba(0, 102, 204, 0.1);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.1);
 }
 
 .visualizer-bars {
@@ -226,9 +226,10 @@ body {
 }
 
 :root.light-theme .voice-btn {
-  box-shadow: 0 5px 30px rgba(0, 102, 204, 0.3),
-              0 0 0 10px rgba(0, 102, 204, 0.1),
-              0 0 0 20px rgba(0, 102, 204, 0.05);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 5px 30px rgba(37, 99, 235, 0.25),
+              0 0 0 10px rgba(37, 99, 235, 0.08),
+              0 0 0 20px rgba(37, 99, 235, 0.04);
 }
 
 .voice-btn:hover {
@@ -239,9 +240,9 @@ body {
 }
 
 :root.light-theme .voice-btn:hover {
-  box-shadow: 0 3px 20px rgba(0, 102, 204, 0.4),
-              0 0 0 10px rgba(0, 102, 204, 0.15),
-              0 0 0 20px rgba(0, 102, 204, 0.08);
+  box-shadow: 0 3px 20px rgba(37, 99, 235, 0.35),
+              0 0 0 10px rgba(37, 99, 235, 0.12),
+              0 0 0 20px rgba(37, 99, 235, 0.06);
 }
 
 .voice-btn:active {
@@ -379,8 +380,9 @@ body {
 }
 
 :root.light-theme .message {
-  background: rgba(248, 250, 252, 0.8);
-  border: 1px solid rgba(0, 102, 204, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .message.user {
@@ -440,9 +442,9 @@ body {
 
 :root.light-theme .info-panel,
 :root.light-theme .quick-actions {
-  background: rgba(248, 250, 252, 0.9);
-  border: 1px solid rgba(0, 102, 204, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .info-panel h3, .quick-actions h3 {
@@ -494,8 +496,9 @@ body {
 }
 
 :root.light-theme .action-btn {
-  background: rgba(0, 102, 204, 0.05);
-  border: 1px solid rgba(0, 102, 204, 0.1);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
 
 .action-btn:hover {
@@ -504,8 +507,8 @@ body {
 }
 
 :root.light-theme .action-btn:hover {
-  background: rgba(0, 102, 204, 0.1);
-  border-color: rgba(0, 102, 204, 0.3);
+  background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .action-btn i {
@@ -576,7 +579,8 @@ body {
 }
 
 :root.light-theme .app-footer {
-  border-top: 1px solid rgba(0, 102, 204, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  border-top: 1px solid rgba(37, 99, 235, 0.1);
 }
 
 .footer-left {
@@ -596,7 +600,8 @@ body {
 }
 
 :root.light-theme .version {
-  background: rgba(0, 102, 204, 0.1);
+  color: var(--text-dark);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .footer-right {
