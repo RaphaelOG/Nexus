@@ -112,9 +112,15 @@
               <i class="fas fa-robot"></i>
               <span>Enable AI Mode</span>
             </button>
-            <button class="action-btn">
-              <i class="fas fa-moon"></i>
-              <span>Dark Theme</span>
+            <button class="action-btn" id="themeToggle">
+              <div class="theme-toggle">
+                <i class="fas fa-sun theme-icon" id="lightIcon"></i>
+                <div class="theme-toggle-switch" id="themeSwitch">
+                  <div class="theme-toggle-slider"></div>
+                </div>
+                <i class="fas fa-moon theme-icon active" id="darkIcon"></i>
+              </div>
+              <span id="themeLabel">Dark Theme</span>
             </button>
             <button class="action-btn">
               <i class="fas fa-language"></i>

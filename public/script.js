@@ -23,7 +23,8 @@ const CONFIG = {
 const state = {
   retryCount: 0,
   isProcessing: false,
-  recognitionActive: false
+  recognitionActive: false,
+  isDarkTheme: true
 };
 
 // DOM Elements
@@ -34,6 +35,13 @@ const statusIndicator = document.createElement('div');
 statusIndicator.className = 'status-indicator';
 micButton.parentNode.insertBefore(statusIndicator, micButton.nextSibling);
 
+// Theme toggle elements
+const themeToggle = document.getElementById('themeToggle');
+const themeSwitch = document.getElementById('themeSwitch');
+const themeLabel = document.getElementById('themeLabel');
+const lightIcon = document.getElementById('lightIcon');
+const darkIcon = document.getElementById('darkIcon');
+
 // Initialize Socket.IO with enhanced configuration
 const socket = io({
   reconnection: true,
@@ -42,6 +50,49 @@ const socket = io({
   reconnectionDelayMax: 5000,
   timeout: 20000
 });
+
+// Theme Management
+function initializeTheme() {
+  // Check for saved theme preference or default to dark
+  const savedTheme = localStorage.getItem('nexus-theme');
+  if (savedTheme) {
+    state.isDarkTheme = savedTheme === 'dark';
+  }
+  
+  updateThemeUI();
+  applyTheme();
+}
+
+function toggleTheme() {
+  state.isDarkTheme = !state.isDarkTheme;
+  localStorage.setItem('nexus-theme', state.isDarkTheme ? 'dark' : 'light');
+  updateThemeUI();
+  applyTheme();
+}
+
+function updateThemeUI() {
+  // Update switch position
+  if (state.isDarkTheme) {
+    themeSwitch.classList.add('active');
+    themeLabel.textContent = 'Dark Theme';
+    lightIcon.classList.remove('active');
+    darkIcon.classList.add('active');
+  } else {
+    themeSwitch.classList.remove('active');
+    themeLabel.textContent = 'Light Theme';
+    lightIcon.classList.add('active');
+    darkIcon.classList.remove('active');
+  }
+}
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (state.isDarkTheme) {
+    root.classList.remove('light-theme');
+  } else {
+    root.classList.add('light-theme');
+  }
+}
 
 // Speech Recognition Setup
 function initializeSpeechRecognition() {
@@ -122,6 +173,12 @@ function setupEventHandlers() {
     } else {
       startRecognition();
     }
+  });
+
+  // Theme toggle handler
+  themeToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleTheme();
   });
 
   // Recognition events
@@ -333,6 +390,9 @@ if (recognition) {
 } else {
   micButton.disabled = true;
 }
+
+// Initialize theme
+initializeTheme();
 
 // Add dynamic styles
 const style = document.createElement('style');

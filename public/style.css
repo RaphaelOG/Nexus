@@ -21,6 +21,22 @@
   --error: #ff3d3d;
 }
 
+/* Light theme variables */
+:root.light-theme {
+  --primary: #0066cc;
+  --primary-dark: #004499;
+  --secondary: #6b46c1;
+  --bg-dark: #f8fafc;
+  --bg-darker: #ffffff;
+  --text-light: #374151;
+  --text-lighter: #111827;
+  --text-dark: #6b7280;
+  --accent: #dc2626;
+  --success: #059669;
+  --warning: #d97706;
+  --error: #dc2626;
+}
+
 html {
   height: 100%;
 }
@@ -33,6 +49,7 @@ body {
   height: 100%;
   overflow-x: hidden;
   position: relative;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .app-container {
@@ -78,6 +95,11 @@ body {
   letter-spacing: 2px;
   text-transform: uppercase;
   text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+:root.light-theme .logo-text {
+  text-shadow: 0 2px 4px rgba(0, 102, 204, 0.2);
 }
 
 .logo-text span {
@@ -138,6 +160,13 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+:root.light-theme .voice-interface {
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(0, 102, 204, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .voice-visualizer {
@@ -147,6 +176,12 @@ body {
   padding: 2rem;
   background: linear-gradient(180deg, rgba(0, 240, 255, 0.05) 0%, transparent 100%);
   border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+:root.light-theme .voice-visualizer {
+  background: linear-gradient(180deg, rgba(0, 102, 204, 0.05) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(0, 102, 204, 0.1);
 }
 
 .visualizer-bars {
@@ -163,6 +198,7 @@ body {
   background: linear-gradient(to top, var(--primary), var(--secondary));
   border-radius: 3px;
   animation: equalize 1.5s infinite ease-in-out;
+  transition: background 0.3s ease;
 }
 
 .visualizer-bars .bar:nth-child(1) { height: 20%; animation-delay: 0.1s; }
@@ -189,11 +225,23 @@ body {
   margin-bottom: 1rem;
 }
 
+:root.light-theme .voice-btn {
+  box-shadow: 0 5px 30px rgba(0, 102, 204, 0.3),
+              0 0 0 10px rgba(0, 102, 204, 0.1),
+              0 0 0 20px rgba(0, 102, 204, 0.05);
+}
+
 .voice-btn:hover {
   transform: scale(0.95);
   box-shadow: 0 3px 20px rgba(0, 240, 255, 0.6),
               0 0 0 10px rgba(0, 240, 255, 0.15),
               0 0 0 20px rgba(0, 240, 255, 0.08);
+}
+
+:root.light-theme .voice-btn:hover {
+  box-shadow: 0 3px 20px rgba(0, 102, 204, 0.4),
+              0 0 0 10px rgba(0, 102, 204, 0.15),
+              0 0 0 20px rgba(0, 102, 204, 0.08);
 }
 
 .voice-btn:active {
@@ -222,6 +270,11 @@ body {
   background: rgba(0, 240, 255, 0.3);
   animation: pulse 2s infinite;
   z-index: 1;
+  transition: background 0.3s ease;
+}
+
+:root.light-theme .pulse-ring {
+  background: rgba(0, 102, 204, 0.3);
 }
 
 .pulse-ring.delay {
@@ -248,6 +301,11 @@ body {
   align-items: center;
   padding: 0.8rem 1.5rem;
   border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+:root.light-theme .conversation-header {
+  border-bottom: 1px solid rgba(0, 102, 204, 0.2);
 }
 
 .conversation-tabs {
@@ -266,6 +324,7 @@ body {
   cursor: pointer;
   text-transform: uppercase;
   position: relative;
+  transition: color 0.3s ease;
 }
 
 .conversation-tabs .tab.active {
@@ -316,6 +375,12 @@ body {
   background: rgba(20, 25, 40, 0.5);
   border-left: 3px solid transparent;
   animation: fadeIn 0.3s ease-out;
+  transition: background-color 0.3s ease;
+}
+
+:root.light-theme .message {
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(0, 102, 204, 0.1);
 }
 
 .message.user {
@@ -370,6 +435,14 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+:root.light-theme .info-panel,
+:root.light-theme .quick-actions {
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(0, 102, 204, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .info-panel h3, .quick-actions h3 {
@@ -420,9 +493,19 @@ body {
   transition: all 0.2s ease;
 }
 
+:root.light-theme .action-btn {
+  background: rgba(0, 102, 204, 0.05);
+  border: 1px solid rgba(0, 102, 204, 0.1);
+}
+
 .action-btn:hover {
   background: rgba(0, 240, 255, 0.1);
   border-color: rgba(0, 240, 255, 0.3);
+}
+
+:root.light-theme .action-btn:hover {
+  background: rgba(0, 102, 204, 0.1);
+  border-color: rgba(0, 102, 204, 0.3);
 }
 
 .action-btn i {
@@ -434,6 +517,53 @@ body {
   font-size: 0.85rem;
 }
 
+.theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background: var(--text-dark);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle-switch.active {
+  background: var(--primary);
+}
+
+.theme-toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-switch.active .theme-toggle-slider {
+  transform: translateX(26px);
+}
+
+.theme-icon {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  transition: color 0.3s ease;
+}
+
+.theme-icon.active {
+  color: var(--primary);
+}
+
 .app-footer {
   display: flex;
   justify-content: space-between;
@@ -442,6 +572,11 @@ body {
   font-size: 0.75rem;
   color: var(--text-dark);
   border-top: 1px solid rgba(0, 240, 255, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+:root.light-theme .app-footer {
+  border-top: 1px solid rgba(0, 102, 204, 0.2);
 }
 
 .footer-left {
@@ -457,6 +592,11 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: 0.65rem;
   letter-spacing: 0.5px;
+  transition: background-color 0.3s ease;
+}
+
+:root.light-theme .version {
+  background: rgba(0, 102, 204, 0.1);
 }
 
 .footer-right {
@@ -490,6 +630,11 @@ body {
   background: rgba(0, 240, 255, 0.3);
   border-radius: 50%;
   animation: float 15s infinite linear;
+  transition: background-color 0.3s ease;
+}
+
+:root.light-theme .particle {
+  background: rgba(0, 102, 204, 0.2);
 }
 
 .particle:nth-child(1) {
@@ -570,6 +715,13 @@ body {
   font-size: 0.8em;
   background: rgba(0,0,0,0.7);
   color: white;
+  transition: background-color 0.3s ease;
+}
+
+:root.light-theme .connection-status {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-light);
+  border: 1px solid rgba(0, 102, 204, 0.2);
 }
 
 button {
@@ -579,4 +731,59 @@ button {
 .output-you, .output-bot {
   transition: all 0.3s ease;
   min-height: 1.2em;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 8px auto;
+  background: #7b2dff;
+  transition: all 0.3s;
+}
+.status-indicator.listening { 
+  background: #00f0ff; 
+  box-shadow: 0 0 8px #00f0ff;
+  animation: pulse 1.5s infinite;
+}
+.status-indicator.processing { 
+  background: #ffb800; 
+  box-shadow: 0 0 8px #ffb800;
+  animation: pulse 1s infinite;
+}
+.status-indicator.error { 
+  background: #ff3d3d; 
+  box-shadow: 0 0 8px #ff3d3d;
+}
+.status-indicator.success { 
+  background: #00ff9d; 
+  box-shadow: 0 0 8px #00ff9d;
+}
+
+button.active { background: #00f0ff; }
+button.processing { background: #ffb800; }
+button.error { background: #ff3d3d; }
+button.success { background: #00ff9d; }
+
+.persistent-error {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff3d3d;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.persistent-error button {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 15px;
+  cursor: pointer;
+  font-size: 1.2em;
 }
