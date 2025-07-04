@@ -15,7 +15,7 @@ const CONFIG = {
     'Google UK English Male',
     'Google UK English Female',
     'Samantha', // macOS
-   
+  
   ]
 };
 
@@ -150,7 +150,8 @@ function initializeSpeechSynthesis() {
         setTimeout(() => synth.resume(), 200); // Longer pause between sentences
       } else if (event.name === 'word') {
         // Add slight variation to word timing
-        const randomDelay = Math.random() * 50;
+        const randomDelay = Math.random() * 25;
+      
         synth.pause();
         setTimeout(() => synth.resume(), randomDelay);
       }
